@@ -1,0 +1,6 @@
+.idea
+.DS_Store
+example.rb
+test/
+.ruby-version
+.ruby-gemset
