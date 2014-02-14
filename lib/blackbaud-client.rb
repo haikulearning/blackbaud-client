@@ -7,6 +7,7 @@ require 'blackbaud-client/api/session.rb'
 require 'blackbaud-client/api/static_code_table.rb'
 require 'blackbaud-client/api/table_entry.rb'
 require 'blackbaud-client/api/term.rb'
+require 'blackbaud-client/api/contact_type.rb'
 require 'hmac-sha1'
 require 'cgi'
 require 'base64'
@@ -29,12 +30,13 @@ module Blackbaud
 
     end
 
-    def construct_url(web_services_url, endpoint)
+    def construct_url(web_services_url, endpoint, filters=nil)
       @url = "#{web_services_url}#{endpoint}?token=#{@token}"
+      @url << "&filter=(#{filters})" if filters
     end
 
-    def connect(endpoint)
-      construct_url(@web_services_url, endpoint)
+    def connect(endpoint, filters=nil)
+      construct_url(@web_services_url, endpoint, filters)
       JSON.parse(RestClient::Request.execute(:method=>'get', :url=>@url))
     end
 
@@ -43,8 +45,18 @@ module Blackbaud
       results["academic_years"].collect {|year| Blackbaud::AcademicYear.new(year)}
     end
 
+    def contact_types
+      results = connect("global/code_tables/phone%20type")
+      results["table_entries"].collect {|ct| Blackbaud::ContactType.new(ct)}
+    end
+
     def people(year)
       results = connect("person/academic_years/#{year.ea7_academic_year_id}/people")
+      results["people"].first["faculty"].collect {|person| Blackbaud::Person.new(person, 1)} + results["people"].first["students"].collect {|person| Blackbaud::Person.new(person, 2)}
+    end
+
+    def people_with_contacts(year, contact_type_id)
+      results = connect("person/academic_years/#{year.ea7_academic_year_id}/people", "contact.type_id%20eq%20#{contact_type_id}" )
       results["people"].first["faculty"].collect {|person| Blackbaud::Person.new(person, 1)} + results["people"].first["students"].collect {|person| Blackbaud::Person.new(person, 2)}
     end
 
