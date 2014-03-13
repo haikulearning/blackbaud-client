@@ -1,6 +1,6 @@
 module Blackbaud
   class Person < BlackbaudObject
-    attr_accessor(:ea7_record_id, :name_for_display, :type, :birth_date, :first_name, :import_id, :last_name, :record_type, :title, :suffix, :middle_name, :user_defined_id, :nickname, :email_address)
+    attr_accessor(:ea7_record_id, :name_for_display, :type, :birth_date, :first_name, :import_id, :last_name, :record_type, :title, :suffix, :middle_name, :user_defined_id, :nickname, :contacts)
 
     def initialize(values, type_id)
 
@@ -12,7 +12,7 @@ module Blackbaud
       end
 
       if values["contact_info"]
-        values["email_address"] = values["contact_info"].first["value"]
+        values["contacts"] = values["contact_info"].map! {|c| Blackbaud::Contact.new(c)}
         values.delete("contact_info")
       end
 
