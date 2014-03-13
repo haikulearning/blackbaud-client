@@ -8,6 +8,7 @@ require 'blackbaud-client/api/static_code_table.rb'
 require 'blackbaud-client/api/table_entry.rb'
 require 'blackbaud-client/api/term.rb'
 require 'blackbaud-client/api/contact_type.rb'
+require 'blackbaud-client/api/contact.rb'
 require 'hmac-sha1'
 require 'cgi'
 require 'base64'
@@ -55,8 +56,8 @@ module Blackbaud
       results["people"].first["faculty"].collect {|person| Blackbaud::Person.new(person, 1)} + results["people"].first["students"].collect {|person| Blackbaud::Person.new(person, 2)}
     end
 
-    def people_with_contacts(year, contact_type_id)
-      results = connect("person/academic_years/#{year.ea7_academic_year_id}/people", "contact.type_id%20eq%20#{contact_type_id}" )
+    def people_with_contacts(year, contact_types)
+      results = connect("person/academic_years/#{year.ea7_academic_year_id}/people", "contact.type_id%20eq%20#{contact_types.join(',')}" )
       results["people"].first["faculty"].collect {|person| Blackbaud::Person.new(person, 1)} + results["people"].first["students"].collect {|person| Blackbaud::Person.new(person, 2)}
     end
 
