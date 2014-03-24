@@ -21,10 +21,10 @@ module Blackbaud
 
     def initialize(options)
       auth_params = {
-        :password => options[:password],
-        :key => options[:key],
-        :user_name => options[:username],
-        :database_number => options[:database]
+        :database_key => options[:database_key],
+        :database_number => options[:database],
+        :vendor_id => options[:vendor_id],
+        :vendor_key => options[:vendor_key]
       }.to_json
       @web_services_url = options[:url]
       @token = JSON.parse(RestClient.post (@web_services_url+'security/access_token'), auth_params, {:content_type=>'application/json'})["token"]
