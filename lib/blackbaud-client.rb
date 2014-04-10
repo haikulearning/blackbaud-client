@@ -22,17 +22,17 @@ module Blackbaud
     def initialize(options)
       auth_params = {
         :database_key => options[:database_key],
-        :database_number => options[:database],
+        :database_number => options[:database_number],
         :vendor_id => options[:vendor_id],
         :vendor_key => options[:vendor_key]
       }.to_json
       @web_services_url = options[:url]
-      @token = JSON.parse(RestClient.post (@web_services_url+'security/access_token'), auth_params, {:content_type=>'application/json'})["token"]
+      @token = JSON.parse(RestClient.post (@web_services_url+'/security/access_token'), auth_params, {:content_type=>'application/json'})["token"]
 
     end
 
     def construct_url(web_services_url, endpoint, filters=nil)
-      @url = "#{web_services_url}#{endpoint}?token=#{@token}"
+      @url = "#{web_services_url}/#{endpoint}?token=#{@token}"
       @url << "&filter=(#{filters})" if filters
     end
 
@@ -51,14 +51,17 @@ module Blackbaud
       results["table_entries"].collect {|ct| Blackbaud::ContactType.new(ct)}
     end
 
-    def people(year)
-      results = connect("person/academic_years/#{year.ea7_academic_year_id}/people")
+    def people(scope, contact_types)
+      results = (scope.class == Blackbaud::Term ? term_people(scope, contact_types) : year_people(scope, contact_types))
       results["people"].first["faculty"].collect {|person| Blackbaud::Person.new(person, 1)} + results["people"].first["students"].collect {|person| Blackbaud::Person.new(person, 2)}
     end
 
-    def people_with_contacts(year, contact_types)
-      results = connect("person/academic_years/#{year.ea7_academic_year_id}/people", "contact.type_id%20eq%20#{contact_types.join(',')}" )
-      results["people"].first["faculty"].collect {|person| Blackbaud::Person.new(person, 1)} + results["people"].first["students"].collect {|person| Blackbaud::Person.new(person, 2)}
+    def year_people(year, contact_types)
+      connect("person/academic_years/#{year.ea7_academic_year_id}/people", "contact.type_id%20eq%20#{contact_types.join(',')}" )
+    end
+
+    def term_people(term, contact_types)
+      connect("person/terms/#{term.ea7_term_id}/people", "contact.type_id%20eq%20#{contact_types.join(',')}" )
     end
 
     def classes(year)

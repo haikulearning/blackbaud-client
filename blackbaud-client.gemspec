@@ -12,4 +12,7 @@ Gem::Specification.new do |gem|
   gem.summary       = "A client for the Blackbaud API."
   gem.files         = `git ls-files`.split($/)
   gem.require_path  = 'lib'
+  gem.add_runtime_dependency     'ruby-hmac'
+  gem.add_runtime_dependency     'rest-client'
+
 end
