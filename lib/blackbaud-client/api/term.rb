@@ -10,5 +10,9 @@ module Blackbaud
 
     end
 
+    def connection_string
+      "terms/#{self.ea7_term_id}"
+    end
+
   end
 end

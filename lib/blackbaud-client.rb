@@ -52,20 +52,12 @@ module Blackbaud
     end
 
     def people(scope, contact_types)
-      results = (scope.class == Blackbaud::Term ? term_people(scope, contact_types) : year_people(scope, contact_types))
+      results = connect("person/#{scope.connection_string}/people", "contact.type_id%20eq%20#{contact_types.join(',')}" )
       results["people"].first["faculty"].collect {|person| Blackbaud::Person.new(person, 1)} + results["people"].first["students"].collect {|person| Blackbaud::Person.new(person, 2)}
     end
 
-    def year_people(year, contact_types)
-      connect("person/academic_years/#{year.ea7_academic_year_id}/people", "contact.type_id%20eq%20#{contact_types.join(',')}" )
-    end
-
-    def term_people(term, contact_types)
-      connect("person/terms/#{term.ea7_term_id}/people", "contact.type_id%20eq%20#{contact_types.join(',')}" )
-    end
-
-    def classes(year)
-      results = connect("schedule/academic_years/#{year.ea7_academic_year_id}/classes")
+    def classes(scope)
+      results = connect("schedule/#{scope.connection_string}/classes")
       results["classes"].collect {|c| Blackbaud::Class.new(c)}
     end
 
