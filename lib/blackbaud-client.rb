@@ -19,6 +19,11 @@ require 'date'
 module Blackbaud
   class Client
 
+    USER_TYPE = {
+     :faculty => 1,
+     :student => 2
+    }
+
     def initialize(options)
       auth_params = {
         :database_key => options[:database_key],
@@ -51,9 +56,14 @@ module Blackbaud
       results["table_entries"].collect {|ct| Blackbaud::ContactType.new(ct)}
     end
 
-    def people(scope, contact_types)
-      results = connect("person/#{scope.connection_string}/people", "contact.type_id%20eq%20#{contact_types.join(',')}" )
-      results["people"].first["faculty"].collect {|person| Blackbaud::Person.new(person, 1)} + results["people"].first["students"].collect {|person| Blackbaud::Person.new(person, 2)}
+    def people(scope, contact_types=nil)
+      filter = contact_types.is_a?(Array) ? "contact.type_id%20eq%20#{contact_types.join(',')}" : nil
+      results = connect("person/#{scope.connection_string}/people", filter )
+      r = [:faculty, :students].collect do |t|
+        p = results["people"].first[t.to_s]
+        (p.nil? ? [] : p.collect {|person| Blackbaud::Person.new(person, (USER_TYPE[t]))})
+      end
+      r.flatten(1)
     end
 
     def classes(scope)
