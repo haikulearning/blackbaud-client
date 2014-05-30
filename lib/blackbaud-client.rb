@@ -20,8 +20,8 @@ module Blackbaud
   class Client
 
     USER_TYPE = {
-     :faculty  => 1,
-     :students => 2
+     :faculty => 1,
+     :student => 2
     }
 
     def initialize(options)
@@ -59,11 +59,20 @@ module Blackbaud
     def people(scope, contact_types=nil)
       filter = contact_types.is_a?(Array) ? "contact.type_id%20eq%20#{contact_types.join(',')}" : nil
       results = connect("person/#{scope.connection_string}/people", filter )
-      r = [:faculty, :students].collect do |t|
-        p = results["people"].first[t.to_s]
-        (p.nil? ? [] : p.collect {|person| Blackbaud::Person.new(person, (USER_TYPE[t]))})
+      r = []
+
+      {
+        'faculty'   => USER_TYPE[:faculty],
+        'students'  => USER_TYPE[:student],
+      }.each do |response_key, type_id|
+        ppl = results["people"].first[response_key]
+        ppl = [] unless ppl.is_a?(Enumerable)
+        ppl.each do |person|
+          r << Blackbaud::Person.new(person, type_id)
+        end
       end
-      r.flatten(1)
+
+      r
     end
 
     def classes(scope)
