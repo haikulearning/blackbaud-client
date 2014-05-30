@@ -20,8 +20,8 @@ module Blackbaud
   class Client
 
     USER_TYPE = {
-     :faculty => 1,
-     :student => 2
+     :faculty  => 1,
+     :students => 2
     }
 
     def initialize(options)
