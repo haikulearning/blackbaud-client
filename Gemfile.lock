@@ -2,8 +2,8 @@ PATH
   remote: .
   specs:
     blackbaud-client (0.0.5)
-      rest-client
-      ruby-hmac
+      rest-client (~> 1.6)
+      ruby-hmac (~> 0.4)
 
 GEM
   remote: https://rubygems.org/
