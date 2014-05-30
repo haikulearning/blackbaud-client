@@ -7,7 +7,7 @@ require 'blackbaud-client/api/session.rb'
 require 'blackbaud-client/api/static_code_table.rb'
 require 'blackbaud-client/api/table_entry.rb'
 require 'blackbaud-client/api/term.rb'
-require 'blackbaud-client/api/contact_type.rb'
+require 'blackbaud-client/api/code_table_entry.rb'
 require 'blackbaud-client/api/contact.rb'
 require 'hmac-sha1'
 require 'cgi'
@@ -53,7 +53,7 @@ module Blackbaud
 
     def contact_types
       results = connect("global/code_tables/phone%20type")
-      results["table_entries"].collect {|ct| Blackbaud::ContactType.new(ct)}
+      results["table_entries"].collect {|entry| Blackbaud::CodeTableEntry.new(entry)}
     end
 
     def people(scope, contact_types=nil)

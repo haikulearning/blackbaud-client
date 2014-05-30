@@ -1,5 +1,5 @@
 module Blackbaud
-  class ContactType < BlackbaudObject
+  class CodeTableEntry < BlackbaudObject
     attr_accessor(:id, :name)
 
     def initialize(values)
