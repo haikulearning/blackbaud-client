@@ -38,11 +38,17 @@ module Blackbaud
 
     def construct_url(web_services_url, endpoint, filters=nil)
       @url = "#{web_services_url}/#{endpoint}?token=#{@token}"
-      @url << "&filter=(#{filters})" if filters
+      Array(filters).each do |k,v|
+        next unless v && !v.to_s.empty?
+        @url << "&filter=(#{k}%20eq%20#{Array(v).join(',')})"
+      end
+
+      @url
     end
 
     def connect(endpoint, filters=nil)
       construct_url(@web_services_url, endpoint, filters)
+      #puts @url.inspect
       JSON.parse(RestClient::Request.execute(:method=>'get', :url=>@url))
     end
 
@@ -56,9 +62,23 @@ module Blackbaud
       results["table_entries"].collect {|entry| Blackbaud::CodeTableEntry.new(entry)}
     end
 
-    def people(scope, contact_types=nil)
-      filter = contact_types.is_a?(Array) ? "contact.type_id%20eq%20#{contact_types.join(',')}" : nil
-      results = connect("person/#{scope.connection_string}/people", filter )
+    def relationships
+      results = connect("global/code_tables/relationship")
+      results["table_entries"].collect {|entry| Blackbaud::CodeTableEntry.new(entry)}
+    end
+
+    # Return an Array of Person records
+    #
+    # Available filter_opts:
+    # * :contact_types: An Array of id values that correspond to code_table table_entry records from the "phone type" code_table
+    # * :relationships: An Array of id values that correspond to code_table table_entry records from the "relationship" code_table
+    def people(scope, filter_opts={})
+      filters = {}
+
+      filters["contact.type_id"] = filter_opts[:contact_types]
+      filters["relation.relationship_code_id"] = filter_opts[:relationships]
+
+      results = connect("person/#{scope.connection_string}/people", filters )
       r = []
 
       {
