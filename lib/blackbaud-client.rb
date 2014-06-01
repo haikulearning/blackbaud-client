@@ -3,12 +3,13 @@ require 'blackbaud-client/api/academic_year.rb'
 require 'blackbaud-client/api/class.rb'
 require 'blackbaud-client/api/code_table.rb'
 require 'blackbaud-client/api/person.rb'
+require 'blackbaud-client/api/contact.rb'
+require 'blackbaud-client/api/relation.rb'
 require 'blackbaud-client/api/session.rb'
 require 'blackbaud-client/api/static_code_table.rb'
 require 'blackbaud-client/api/table_entry.rb'
 require 'blackbaud-client/api/term.rb'
 require 'blackbaud-client/api/code_table_entry.rb'
-require 'blackbaud-client/api/contact.rb'
 require 'hmac-sha1'
 require 'cgi'
 require 'base64'
@@ -18,11 +19,6 @@ require 'date'
 
 module Blackbaud
   class Client
-
-    USER_TYPE = {
-     :faculty => 1,
-     :student => 2
-    }
 
     def initialize(options)
       auth_params = {
@@ -82,8 +78,8 @@ module Blackbaud
       r = []
 
       {
-        'faculty'   => USER_TYPE[:faculty],
-        'students'  => USER_TYPE[:student],
+        'faculty'   => Blackbaud::Person::USER_TYPE[:faculty],
+        'students'  => Blackbaud::Person::USER_TYPE[:student],
       }.each do |response_key, type_id|
         ppl = results["people"].first[response_key]
         ppl = [] unless ppl.is_a?(Enumerable)
