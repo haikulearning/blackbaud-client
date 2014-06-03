@@ -35,8 +35,9 @@ module Blackbaud
     def construct_url(web_services_url, endpoint, filters=nil)
       @url = "#{web_services_url}/#{endpoint}?token=#{@token}"
       Array(filters).each do |k,v|
-        next unless v && !v.to_s.empty?
-        @url << "&filter=(#{k}%20eq%20#{Array(v).join(',')})"
+        v = Array(v)
+        next unless v && !v.join.empty?
+        @url << "&filter=(#{k}%20eq%20#{v.join(',')})"
       end
 
       @url
