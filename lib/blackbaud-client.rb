@@ -32,21 +32,10 @@ module Blackbaud
 
     end
 
-    def construct_url(web_services_url, endpoint, filters=nil)
-      @url = "#{web_services_url}/#{endpoint}?token=#{@token}"
-      Array(filters).each do |k,v|
-        v = Array(v)
-        next unless v && !v.join.empty?
-        @url << "&filter=(#{k}%20eq%20#{v.join(',')})"
-      end
-
-      @url
-    end
-
     def connect(endpoint, filters=nil)
-      construct_url(@web_services_url, endpoint, filters)
-      #puts @url.inspect
-      JSON.parse(RestClient::Request.execute(:method=>'get', :url=>@url))
+      url = construct_url(@web_services_url, endpoint, filters)
+      #puts url.inspect
+      JSON.parse(RestClient::Request.execute(:method=>'get', :url=>url))
     end
 
     def academic_years(id)
@@ -111,5 +100,19 @@ module Blackbaud
       results = connect("global/static_code_tables/#{id}")
       results["table_entries"].collect {|c| Blackbaud::TableEntry.new(c)}
     end
+
+    private
+
+    def construct_url(web_services_url, endpoint, filters=nil)
+      url = "#{web_services_url}/#{endpoint}?token=#{@token}"
+      Array(filters).each do |k,v|
+        v = Array(v)
+        next unless v && !v.join.empty?
+        url << "&filter=(#{k}%20eq%20#{v.join(',')})"
+      end
+
+      url
+    end
+
   end
 end
