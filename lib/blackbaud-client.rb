@@ -105,11 +105,12 @@ module Blackbaud
 
     def construct_url(web_services_url, endpoint, filters=nil)
       url = "#{web_services_url}/#{endpoint}?token=#{@token}"
-      Array(filters).each do |k,v|
+      filters = Array(filters).map do |k,v|
         v = Array(v)
-        next unless v && !v.join.empty?
-        url << "&filter=(#{k}%20eq%20#{v.join(',')})"
+        "(#{k}%20eq%20#{v.join(',')})" if v && !v.join.empty?
       end
+
+      url << "&filter=#{filters.join}"
 
       url
     end
