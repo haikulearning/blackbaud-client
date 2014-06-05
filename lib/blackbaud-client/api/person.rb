@@ -20,10 +20,14 @@ module Blackbaud
       if values["contact_info"]
         values["contacts"] = values["contact_info"].map {|c| Blackbaud::Contact.new(c)}
         values.delete("contact_info")
+      else
+        values["contacts"] = []
       end
 
       if values["relations"]
         values["relations"].map! {|r| Blackbaud::Relation.new(r)}
+      else
+        values["relations"] = []
       end
 
       values["birth_date"] = format_date(values["birth_date"]) if values["birth_date"]
