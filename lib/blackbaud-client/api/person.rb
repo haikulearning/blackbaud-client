@@ -33,5 +33,17 @@ module Blackbaud
       end
     end
 
+    def faculty?
+      type == USER_TYPE[:faculty]
+    end
+
+    def student?
+      type == USER_TYPE[:student]
+    end
+
+    def undefined_type?
+      type == USER_TYPE[:undefined]
+    end
+
   end
 end
