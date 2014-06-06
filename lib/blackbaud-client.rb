@@ -1,3 +1,4 @@
+require 'blackbaud-client/version.rb'
 require 'blackbaud-client/api/blackbaud_object.rb'
 require 'blackbaud-client/api/academic_year.rb'
 require 'blackbaud-client/api/class.rb'

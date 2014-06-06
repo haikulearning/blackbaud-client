@@ -2,9 +2,11 @@
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
 
+require 'blackbaud-client/version'
+
 Gem::Specification.new do |gem|
   gem.name          = "blackbaud-client"
-  gem.version       = "0.0.5"
+  gem.version       = Blackbaud::Client::Version.to_s
   gem.authors       = "Alex Dugger"
   gem.email         = "alexd@haikulearning.com"
   gem.description   = "A client for the Blackbaud API."
