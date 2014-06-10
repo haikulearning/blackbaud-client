@@ -30,13 +30,14 @@ module Blackbaud
       }.to_json
       @web_services_url = options[:url]
       @token = JSON.parse(RestClient.post (@web_services_url+'/security/access_token'), auth_params, {:content_type=>'application/json'})["token"]
-
+      @save_request_data_to = options[:save_request_data_to]
     end
 
     def connect(endpoint, filters=nil)
       url = construct_url(@web_services_url, endpoint, filters)
-      #puts url.inspect
-      JSON.parse(RestClient::Request.execute(:method=>'get', :url=>url))
+      json = RestClient::Request.execute(:method=>'get', :url=>url)
+      write_json_to_file(url, json) if @save_request_data_to
+      JSON.parse(json)
     end
 
     def academic_years(id)
@@ -103,6 +104,15 @@ module Blackbaud
     end
 
     private
+
+    def write_json_to_file(url, data)
+      return unless data
+      file = url.gsub( /\/|\\/, ':' ).match(/.{,250}$/).to_s + '.json'
+      # file = /[^\/]*$/.match(url).to_s + '.json'
+      file = File.expand_path(File.join(@save_request_data_to, file))
+      FileUtils.mkdir_p @save_request_data_to
+      File.open(file, 'w') { |f| f.write(data) }
+    end
 
     def construct_url(web_services_url, endpoint, filters=nil)
       url = "#{web_services_url}/#{endpoint}?token=#{@token}"
