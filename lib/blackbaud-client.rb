@@ -111,7 +111,7 @@ module Blackbaud
       # file = /[^\/]*$/.match(url).to_s + '.json'
       file = File.expand_path(File.join(@save_request_data_to, file))
       FileUtils.mkdir_p @save_request_data_to
-      File.open(file, 'w') { |f| f.write(data) }
+      File.open(file, 'w') { |f| f.write(JSON.pretty_unparse(JSON.parse(data)))}
     end
 
     def construct_url(web_services_url, endpoint, filters=nil)
