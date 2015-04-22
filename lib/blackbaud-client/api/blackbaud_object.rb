@@ -3,9 +3,7 @@ module Blackbaud
 
     def initialize(values)
       values.each do |k,v|
-        if respond_to?("#{k}=".intern)
-          send("#{k}=".intern, v)
-        end
+        send("#{k}=".intern, v) if respond_to?("#{k}=".intern)
       end
     end
 

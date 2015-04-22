@@ -11,14 +11,14 @@ module Blackbaud
       end
 
       super(values)
+    end
 
-      def connection_string
-        "academic_years/#{self.ea7_academic_year_id}"
-      end
+    def connection_string
+      "academic_years/#{self.ea7_academic_year_id}"
+    end
 
-      def terms
-        self.sessions.inject([]) {|r, s| r + s.terms}
-      end
+    def terms
+      self.sessions.inject([]) {|r, s| r + s.terms}
     end
 
   end
