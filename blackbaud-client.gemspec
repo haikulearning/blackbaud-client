@@ -17,4 +17,6 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency  'ruby-hmac',    '~>0.4'
   gem.add_runtime_dependency  'rest-client',  '~>1.6'
+
+  gem.add_development_dependency  'rake'
 end
