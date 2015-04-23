@@ -1,3 +1,6 @@
+[![Gem Version](https://badge.fury.io/rb/blackbaud-client.svg)](http://badge.fury.io/rb/blackbaud-client)
+[![Code Climate](https://codeclimate.com/github/haikulearning/blackbaud-client/badges/gpa.svg)](https://codeclimate.com/github/haikulearning/blackbaud-client)
+
 # Blackbaud Client
 Ruby client for the Blackbaud API.
 
@@ -16,15 +19,5 @@ Create a Blackbaud API Client
     @client = Blackbaud::Client.new(options)
 
 ## Version History
-### 0.1.3
-- Added emergency_contact attribute to Relation.
-- Various fixes and cleanup.
 
-### 0.1.2
-- Format JSON output for readability.
-
-### 0.1.1
-- Option to store raw JSON response data
-
-### 0.1.0
-- Initial Release
+[See the change log](CHANGELOG.md)
