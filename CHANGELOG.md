@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.1.4 - 2015-07-14
+### Changed
+- Added deceased attribute to Person.
+
 ## 0.1.3 - 2015-04-22
 ### Changed
 - Added emergency_contact attribute to Relation.
