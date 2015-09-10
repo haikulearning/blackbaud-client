@@ -11,6 +11,10 @@ require 'blackbaud-client/api/static_code_table.rb'
 require 'blackbaud-client/api/table_entry.rb'
 require 'blackbaud-client/api/term.rb'
 require 'blackbaud-client/api/code_table_entry.rb'
+require 'blackbaud-client/api/attendance_code.rb'
+require 'blackbaud-client/api/attendance_record.rb'
+require 'blackbaud-client/api/attendance_by_day_record.rb'
+require 'blackbaud-client/api/attendance_by_class_record.rb'
 require 'hmac-sha1'
 require 'cgi'
 require 'base64'
@@ -88,6 +92,11 @@ module Blackbaud
       results["classes"].collect {|c| Blackbaud::Class.new(c)}
     end
 
+    def class(id)
+      results = connect("schedule/classes/#{id}")
+      Blackbaud::Class.new(results["classes"].first)
+    end
+
     def code_tables
       results = connect("global/code_tables")
       results["code_tables"].collect {|table| Blackbaud::CodeTable.new(table)}
@@ -103,6 +112,21 @@ module Blackbaud
       results["table_entries"].collect {|c| Blackbaud::TableEntry.new(c)}
     end
 
+    def attendance_codes
+      results = connect("attendance/codes")
+      results["attendance_codes"].collect {|code| Blackbaud::AttendanceCode.new(code)}
+    end
+
+    def attendance_by_class(ea7_class_id, start_date, end_date = nil)
+      results = connect("attendance/class/#{ea7_class_id}/#{format_date(start_date)}/#{format_date(end_date)}")
+      results["attendance_by_class_records"].collect {|record| Blackbaud::AttendanceByClassRecord.new(record)}
+    end
+
+    def attendance_by_day(ea7_class_id, start_date, end_date = nil)
+      results = connect("attendance/day/#{ea7_class_id}/#{start_date}/#{end_date}")
+      results["attendance_by_day_records"].collect {|record| Blackbaud::AttendanceByDayRecord.new(record)}
+    end
+
     private
 
     def write_json_to_file(url, data)
@@ -112,6 +136,12 @@ module Blackbaud
       file = File.expand_path(File.join(@save_request_data_to, file))
       FileUtils.mkdir_p @save_request_data_to
       File.open(file, 'w') { |f| f.write(JSON.pretty_unparse(JSON.parse(data)))}
+    end
+
+    def format_date(date)
+      return unless date
+      date = DateTime.parse(date) if date.is_a?(String)
+      date.strftime("%F")
     end
 
     def construct_url(web_services_url, endpoint, filters=nil)
