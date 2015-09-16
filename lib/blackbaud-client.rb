@@ -15,6 +15,8 @@ require 'blackbaud-client/api/attendance_code.rb'
 require 'blackbaud-client/api/attendance_record.rb'
 require 'blackbaud-client/api/attendance_by_day_record.rb'
 require 'blackbaud-client/api/attendance_by_class_record.rb'
+require 'blackbaud-client/api/grade.rb'
+require 'blackbaud-client/api/marking_column.rb'
 require 'hmac-sha1'
 require 'cgi'
 require 'base64'
@@ -46,17 +48,18 @@ module Blackbaud
 
     def academic_years(id)
       results = connect("schedule/#{id}/academic_years")
-      results["academic_years"].collect {|year| Blackbaud::AcademicYear.new(year)}
+      # results["academic_years"].collect {|year| Blackbaud::AcademicYear.new(year)}
+      create_blackbaud_objects(Blackbaud::AcademicYear, results["academic_years"])
     end
 
     def contact_types
       results = connect("global/code_tables/phone%20type")
-      results["table_entries"].collect {|entry| Blackbaud::CodeTableEntry.new(entry)}
+      create_blackbaud_objects(Blackbaud::CodeTableEntry, results["table_entries"])
     end
 
     def relationships
       results = connect("global/code_tables/relationship")
-      results["table_entries"].collect {|entry| Blackbaud::CodeTableEntry.new(entry)}
+      create_blackbaud_objects(Blackbaud::CodeTableEntry, results["table_entries"])
     end
 
     def person(id, filter_opts={})
@@ -66,7 +69,7 @@ module Blackbaud
 
       results = connect("person/people/#{id}", filters)
 
-      results["people"].is_a?(Enumerable) ? Blackbaud::Person.new(results["people"].first) : nil
+      create_blackbaud_object(Blackbaud::Person, results["people"].first)
     end
 
     # Return an Array of Person records
@@ -79,64 +82,84 @@ module Blackbaud
       filters["contact.type_id"] = filter_opts[:contact_types]
       filters["relation.relationship_code_id"] = filter_opts[:relationships]
 
-      results = connect("person/#{scope.connection_string}/people", filters )
-      r = []
+      results = connect("person/#{scope.connection_string}/people", filters ).people.first
 
       {
         'faculty'   => Blackbaud::Person::USER_TYPE[:faculty],
         'students'  => Blackbaud::Person::USER_TYPE[:student],
       }.each do |response_key, type_id|
-        ppl = results["people"].first[response_key]
-        ppl = [] unless ppl.is_a?(Enumerable)
-        ppl.each do |person|
-          r << Blackbaud::Person.new(person, type_id)
+        if results[response_key].is_a?(Enumerable)
+          results[response_key].each{|person| person['type'] = type_id}
         end
       end
-
-      r
+      create_blackbaud_object(Blackbaud::Person, results['factuly'] + results['students'])
     end
 
     def classes(scope)
       results = connect("schedule/#{scope.connection_string}/classes")
-      results["classes"].collect {|c| Blackbaud::Class.new(c)}
+      create_blackbaud_objects(Blackbaud::Class, results["classes"])
     end
 
     def class(id)
       results = connect("schedule/classes/#{id}")
-      Blackbaud::Class.new(results["classes"].first)
+      create_blackbaud_object(Blackbaud::Class, results["classes"].first)
     end
 
     def code_tables
       results = connect("global/code_tables")
-      results["code_tables"].collect {|table| Blackbaud::CodeTable.new(table)}
+      create_blackbaud_objects(Blackbaud::CodeTable, results["code_tables"])
     end
 
     def code_table_entries(code_table)
       results = connect("global/code_tables/#{code_table.id}")
-      results["table_entries"].collect {|entry| Blackbaud::TableEntry.new(entry)}
+      create_blackbaud_objects(Blackbaud::TableEntry, results["table_entries"])
     end
 
     def static_code_tables(id)
       results = connect("global/static_code_tables/#{id}")
-      results["table_entries"].collect {|c| Blackbaud::TableEntry.new(c)}
+      create_blackbaud_objects(Blackbaud::TableEntry, results["table_entries"])
     end
 
     def attendance_codes
       results = connect("attendance/codes")
-      results["attendance_codes"].collect {|code| Blackbaud::AttendanceCode.new(code)}
+      create_blackbaud_objects(Blackbaud::AttendanceCode, results["attendance_codes"])
     end
 
     def attendance_by_class(ea7_class_id, start_date, end_date = nil)
       results = connect("attendance/class/#{ea7_class_id}/#{format_date(start_date)}/#{format_date(end_date)}")
-      results["attendance_by_class_records"].collect {|record| Blackbaud::AttendanceByClassRecord.new(record)}
+      create_blackbaud_objects(Blackbaud::AttendanceByClassRecord, results["attendance_by_class_records"])
     end
 
     def attendance_by_day(ea7_class_id, start_date, end_date = nil)
       results = connect("attendance/day/#{ea7_class_id}/#{start_date}/#{end_date}")
-      results["attendance_by_day_records"].collect {|record| Blackbaud::AttendanceByDayRecord.new(record)}
+      create_blackbaud_objects(Blackbaud::AttendanceByDayRecord, results["attendance_by_day_records"])
+    end
+
+    def class_marking_columns(class_id)
+      results = connect("grade/classes/#{class_id}/marking_columns")
+      results["class_marking_columns"].each{|column| column["ea7_class_id"] = class_id}
+      create_blackbaud_objects(Blackbaud::MarkingColumn, results["class_marking_columns"])
+    end
+
+    def grades(class_id, marking_column_id)
+      results = connect("grade/classes/#{class_id}/marking_columns/#{marking_column_id}/grades")
+      create_blackbaud_objects(Blackbaud::Grade, results["grades"])
     end
 
     private
+
+    def create_blackbaud_objects(klass, results)
+      results = [results] if results.class == Hash
+      ret = results.collect do |result|
+        klass.new({values: result, client: self})
+      end
+      ret || []
+    end
+
+    def create_blackbaud_object(klass, result)
+      klass.new({values: result, client: self})
+    end
+
 
     def write_json_to_file(url, data)
       return unless data
