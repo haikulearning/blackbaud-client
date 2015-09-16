@@ -8,7 +8,7 @@ module Blackbaud
      :undefined => nil,
     }
 
-    def initialize(values, type_id)
+    def initialize(values, type_id = nil)
       values["type"] = type_id
 
       if values["bio"]

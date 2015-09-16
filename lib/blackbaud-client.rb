@@ -59,6 +59,16 @@ module Blackbaud
       results["table_entries"].collect {|entry| Blackbaud::CodeTableEntry.new(entry)}
     end
 
+    def person(id, filter_opts={})
+      filters = {}
+      filters["contact.type_id"] = filter_opts[:contact_types]
+      filters["relation.relationship_code_id"] = filter_opts[:relationships]
+
+      results = connect("person/people/#{id}", filters)
+
+      results["people"].is_a?(Enumerable) ? Blackbaud::Person.new(results["people"].first) : nil
+    end
+
     # Return an Array of Person records
     #
     # Available filter_opts:
@@ -66,7 +76,6 @@ module Blackbaud
     # * :relationships: An Array of id values that correspond to code_table table_entry records from the "relationship" code_table
     def people(scope, filter_opts={})
       filters = {}
-
       filters["contact.type_id"] = filter_opts[:contact_types]
       filters["relation.relationship_code_id"] = filter_opts[:relationships]
 
