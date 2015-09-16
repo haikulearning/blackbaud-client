@@ -8,7 +8,6 @@ require 'blackbaud-client/api/contact.rb'
 require 'blackbaud-client/api/relation.rb'
 require 'blackbaud-client/api/session.rb'
 require 'blackbaud-client/api/static_code_table.rb'
-require 'blackbaud-client/api/table_entry.rb'
 require 'blackbaud-client/api/term.rb'
 require 'blackbaud-client/api/code_table_entry.rb'
 require 'blackbaud-client/api/attendance_code.rb'
@@ -17,6 +16,8 @@ require 'blackbaud-client/api/attendance_by_day_record.rb'
 require 'blackbaud-client/api/attendance_by_class_record.rb'
 require 'blackbaud-client/api/grade.rb'
 require 'blackbaud-client/api/marking_column.rb'
+require 'blackbaud-client/api/translation_table.rb'
+require 'blackbaud-client/api/translation_table_entry.rb'
 require 'hmac-sha1'
 require 'cgi'
 require 'base64'
@@ -100,6 +101,7 @@ module Blackbaud
       create_blackbaud_objects(Blackbaud::Class, results["classes"])
     end
 
+    #TODO: Rename this method.
     def class(id)
       results = connect("schedule/classes/#{id}")
       create_blackbaud_object(Blackbaud::Class, results["classes"].first)
@@ -112,12 +114,12 @@ module Blackbaud
 
     def code_table_entries(code_table)
       results = connect("global/code_tables/#{code_table.id}")
-      create_blackbaud_objects(Blackbaud::TableEntry, results["table_entries"])
+      create_blackbaud_objects(Blackbaud::CodeTableEntry, results["table_entries"])
     end
 
     def static_code_tables(id)
       results = connect("global/static_code_tables/#{id}")
-      create_blackbaud_objects(Blackbaud::TableEntry, results["table_entries"])
+      create_blackbaud_objects(Blackbaud::CodeTableEntry, results["table_entries"])
     end
 
     def attendance_codes
@@ -144,6 +146,16 @@ module Blackbaud
     def grades(class_id, marking_column_id)
       results = connect("grade/classes/#{class_id}/marking_columns/#{marking_column_id}/grades")
       create_blackbaud_objects(Blackbaud::Grade, results["grades"])
+    end
+
+    def faweb_grades(class_id, marking_column_id)
+      results = connect("faweb_grade/classes/#{class_id}/marking_columns/#{marking_column_id}/grades")
+      create_blackbaud_objects(Blackbaud::Grade, results["faweb_grades"])
+    end
+
+    def translation_tables(id=nil)
+      results = connect("grade/translation_tables/#{id}")
+      create_blackbaud_objects(Blackbaud::TranslationTable, results["translation_tables"])
     end
 
     private
