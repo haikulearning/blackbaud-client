@@ -19,7 +19,7 @@ module Blackbaud
     end
 
     def marking_columns
-      @client.class_marking_columns(self.ea7_class_id)
+      @client.get_class_marking_columns(self.ea7_class_id)
     end
 
   end

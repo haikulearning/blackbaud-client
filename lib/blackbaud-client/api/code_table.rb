@@ -3,7 +3,7 @@ module Blackbaud
     attr_accessor(:_links, :id, :name, :links)
 
     def entries
-      @client.code_table_entries(self)
+      @client.get_code_table_entries(self)
     end
 
   end

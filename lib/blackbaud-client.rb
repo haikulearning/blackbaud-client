@@ -47,23 +47,23 @@ module Blackbaud
       JSON.parse(json)
     end
 
-    def academic_years(id)
+    def get_academic_years(id)
       results = connect("schedule/#{id}/academic_years")
       # results["academic_years"].collect {|year| Blackbaud::AcademicYear.new(year)}
       create_blackbaud_objects(Blackbaud::AcademicYear, results["academic_years"])
     end
 
-    def contact_types
+    def get_contact_types
       results = connect("global/code_tables/phone%20type")
       create_blackbaud_objects(Blackbaud::CodeTableEntry, results["table_entries"])
     end
 
-    def relationships
+    def get_relationships
       results = connect("global/code_tables/relationship")
       create_blackbaud_objects(Blackbaud::CodeTableEntry, results["table_entries"])
     end
 
-    def person(id, filter_opts={})
+    def get_person(id, filter_opts={})
       filters = {}
       filters["contact.type_id"] = filter_opts[:contact_types]
       filters["relation.relationship_code_id"] = filter_opts[:relationships]
@@ -78,7 +78,7 @@ module Blackbaud
     # Available filter_opts:
     # * :contact_types: An Array of id values that correspond to code_table table_entry records from the "phone type" code_table
     # * :relationships: An Array of id values that correspond to code_table table_entry records from the "relationship" code_table
-    def people(scope, filter_opts={})
+    def get_people(scope, filter_opts={})
       filters = {}
       filters["contact.type_id"] = filter_opts[:contact_types]
       filters["relation.relationship_code_id"] = filter_opts[:relationships]
@@ -96,67 +96,86 @@ module Blackbaud
       create_blackbaud_object(Blackbaud::Person, results['factuly'] + results['students'])
     end
 
-    def classes(scope)
+    def get_classes(scope)
       results = connect("schedule/#{scope.connection_string}/classes")
       create_blackbaud_objects(Blackbaud::Class, results["classes"])
     end
 
     #TODO: Rename this method.
-    def class(id)
+    def get_class(id)
       results = connect("schedule/classes/#{id}")
       create_blackbaud_object(Blackbaud::Class, results["classes"].first)
     end
 
-    def code_tables
+    def get_code_tables
       results = connect("global/code_tables")
       create_blackbaud_objects(Blackbaud::CodeTable, results["code_tables"])
     end
 
-    def code_table_entries(code_table)
+    def get_code_table_entries(code_table)
       results = connect("global/code_tables/#{code_table.id}")
       create_blackbaud_objects(Blackbaud::CodeTableEntry, results["table_entries"])
     end
 
-    def static_code_tables(id)
+    def get_static_code_tables(id)
       results = connect("global/static_code_tables/#{id}")
       create_blackbaud_objects(Blackbaud::CodeTableEntry, results["table_entries"])
     end
 
-    def attendance_codes
+    def get_attendance_codes
       results = connect("attendance/codes")
       create_blackbaud_objects(Blackbaud::AttendanceCode, results["attendance_codes"])
     end
 
-    def attendance_by_class(ea7_class_id, start_date, end_date = nil)
+    def get_attendance_by_class(ea7_class_id, start_date, end_date = nil)
       results = connect("attendance/class/#{ea7_class_id}/#{format_date(start_date)}/#{format_date(end_date)}")
       create_blackbaud_objects(Blackbaud::AttendanceByClassRecord, results["attendance_by_class_records"])
     end
 
-    def attendance_by_day(ea7_class_id, start_date, end_date = nil)
+    def get_attendance_by_day(ea7_class_id, start_date, end_date = nil)
       results = connect("attendance/day/#{ea7_class_id}/#{start_date}/#{end_date}")
       create_blackbaud_objects(Blackbaud::AttendanceByDayRecord, results["attendance_by_day_records"])
     end
 
-    def class_marking_columns(class_id)
+    def get_class_marking_columns(class_id)
       results = connect("grade/classes/#{class_id}/marking_columns")
       results["class_marking_columns"].each{|column| column["ea7_class_id"] = class_id}
       create_blackbaud_objects(Blackbaud::MarkingColumn, results["class_marking_columns"])
     end
 
-    def grades(class_id, marking_column_id)
+    def get_grades(class_id, marking_column_id)
       results = connect("grade/classes/#{class_id}/marking_columns/#{marking_column_id}/grades")
       create_blackbaud_objects(Blackbaud::Grade, results["grades"])
     end
 
-    def faweb_grades(class_id, marking_column_id)
+    def get_faweb_grades(class_id, marking_column_id)
       results = connect("faweb_grade/classes/#{class_id}/marking_columns/#{marking_column_id}/grades")
       create_blackbaud_objects(Blackbaud::Grade, results["faweb_grades"])
     end
 
-    def translation_tables(id=nil)
+    def get_translation_tables(id=nil)
       results = connect("grade/translation_tables/#{id}")
       create_blackbaud_objects(Blackbaud::TranslationTable, results["translation_tables"])
     end
+
+    # These are for backwards compatiobilty with version <=0.1.4.  Remove them before v 1.0.
+    alias_method :academic_years, :get_academic_years
+    alias_method :contact_types, :get_contact_types
+    alias_method :relationships, :get_relationships
+    alias_method :person, :get_person
+    alias_method :people, :get_people
+    alias_method :classes, :get_classes
+    alias_method :class, :get_class
+    alias_method :code_tables, :get_code_tables
+    alias_method :code_table_entries, :get_code_table_entries
+    alias_method :static_code_tables, :get_static_code_tables
+    alias_method :attendance_codes, :get_attendance_codes
+    alias_method :attendance_by_class, :get_attendance_by_class
+    alias_method :attendance_by_day, :get_attendance_by_day
+    alias_method :class_marking_columns, :get_class_marking_columns
+    alias_method :grades, :get_grades
+    alias_method :faweb_grades, :get_faweb_grades
+    alias_method :translation_tables, :get_translation_tables
 
     private
 
