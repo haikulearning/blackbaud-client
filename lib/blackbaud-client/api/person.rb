@@ -15,7 +15,7 @@ module Blackbaud
       end
 
       if options.fetch(:values)["contact_info"]
-        options.fetch(:values)["contacts"] = values["contact_info"].map {|c| Blackbaud::Contact.new({values: c})}
+        options.fetch(:values)["contacts"] = options.fetch(:values)["contact_info"].map {|c| Blackbaud::Contact.new({values: c})}
         options.fetch(:values).delete("contact_info")
       else
         options.fetch(:values)["contacts"] = []

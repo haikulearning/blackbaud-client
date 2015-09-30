@@ -26,40 +26,78 @@ require 'rest-client'
 require 'date'
 
 module Blackbaud
-  class Client
+  class Connector
+    attr_accessor(:token, :web_services_url, :save_request_data_to)
+    def initialize(url, save_request_data_to)
+      @web_services_url = url
+      @save_request_data_to = save_request_data_to
+    end
 
+    def get(endpoint, filters=nil)
+      url = construct_url(@web_services_url, endpoint, filters)
+      response = RestClient.get(url)
+      write_json_to_file(url, json) if @save_request_data_to
+      JSON.parse(response)
+    end
+
+    def post(endpoint, body)
+      url = construct_url(@web_services_url, endpoint)
+      response = RestClient.post(url, body, {:content_type=>'application/json'})
+      JSON.parse(response)
+    end
+
+    def construct_url(web_services_url, endpoint, filters=nil)
+      params = "?token=#{@token}" if @token
+      if filters
+        filters = Array(filters).map do |k,v|
+          v = Array(v)
+          "(#{k}%20eq%20#{v.join(',')})" if v && !v.join.empty?
+        end
+        params << "&filter=#{filters.join}"
+      end
+      url = "#{web_services_url}/#{endpoint}#{params}"
+    end
+
+    def write_json_to_file(url, data)
+      return unless data
+      file = url.gsub( /\/|\\/, ':' ).match(/.{,250}$/).to_s + '.json'
+      file = File.expand_path(File.join(@save_request_data_to, file))
+      FileUtils.mkdir_p @save_request_data_to
+      File.open(file, 'w') { |f| f.write(JSON.pretty_unparse(JSON.parse(data)))}
+    end
+  end
+
+  class Client
+    attr_accessor(:connector)
     def initialize(options)
+      @connector = Blackbaud::Connector.new(options[:url], options[:save_request_data_to])
       auth_params = {
         :database_key => options[:database_key],
         :database_number => options[:database_number],
         :vendor_id => options[:vendor_id],
         :vendor_key => options[:vendor_key]
       }.to_json
-      @web_services_url = options[:url]
-      @token = JSON.parse(RestClient.post (@web_services_url+'/security/access_token'), auth_params, {:content_type=>'application/json'})["token"]
-      @save_request_data_to = options[:save_request_data_to]
+      @connector.token = get_token(auth_params)
     end
 
-    def connect(endpoint, filters=nil)
-      url = construct_url(@web_services_url, endpoint, filters)
-      json = RestClient::Request.execute(:method=>'get', :url=>url)
-      write_json_to_file(url, json) if @save_request_data_to
-      JSON.parse(json)
+    def get_token(auth_params)
+      results = @connector.post('/security/access_token', auth_params)
+      results["token"]
     end
 
     def get_academic_years(id)
-      results = connect("schedule/#{id}/academic_years")
+      results = @connector.get("schedule/#{id}/academic_years")
       # results["academic_years"].collect {|year| Blackbaud::AcademicYear.new(year)}
       create_blackbaud_objects(Blackbaud::AcademicYear, results["academic_years"])
     end
 
     def get_contact_types
-      results = connect("global/code_tables/phone%20type")
+      results = @connector.get("global/code_tables/phone%20type")
       create_blackbaud_objects(Blackbaud::CodeTableEntry, results["table_entries"])
     end
 
     def get_relationships
-      results = connect("global/code_tables/relationship")
+      results = @connector.get("global/code_tables/relationship")
       create_blackbaud_objects(Blackbaud::CodeTableEntry, results["table_entries"])
     end
 
@@ -67,9 +105,7 @@ module Blackbaud
       filters = {}
       filters["contact.type_id"] = filter_opts[:contact_types]
       filters["relation.relationship_code_id"] = filter_opts[:relationships]
-
-      results = connect("person/people/#{id}", filters)
-
+      results = @connector.get("person/people/#{id}", filters)
       create_blackbaud_object(Blackbaud::Person, results["people"].first)
     end
 
@@ -83,7 +119,7 @@ module Blackbaud
       filters["contact.type_id"] = filter_opts[:contact_types]
       filters["relation.relationship_code_id"] = filter_opts[:relationships]
 
-      results = connect("person/#{scope.connection_string}/people", filters ).people.first
+      results = @connector.get("person/#{scope.connection_string}/people", filters)["people"].first
 
       {
         'faculty'   => Blackbaud::Person::USER_TYPE[:faculty],
@@ -93,68 +129,67 @@ module Blackbaud
           results[response_key].each{|person| person['type'] = type_id}
         end
       end
-      create_blackbaud_object(Blackbaud::Person, results['factuly'] + results['students'])
+      create_blackbaud_objects(Blackbaud::Person, results['faculty'] + results['students'])
     end
 
     def get_classes(scope)
-      results = connect("schedule/#{scope.connection_string}/classes")
+      results = @connector.get("schedule/#{scope.connection_string}/classes")
       create_blackbaud_objects(Blackbaud::Class, results["classes"])
     end
 
-    #TODO: Rename this method.
     def get_class(id)
-      results = connect("schedule/classes/#{id}")
+      results = @connector.get("schedule/classes/#{id}")
       create_blackbaud_object(Blackbaud::Class, results["classes"].first)
     end
 
     def get_code_tables
-      results = connect("global/code_tables")
+      results = @connector.get("global/code_tables")
       create_blackbaud_objects(Blackbaud::CodeTable, results["code_tables"])
     end
 
     def get_code_table_entries(code_table)
-      results = connect("global/code_tables/#{code_table.id}")
+      results = @connector.get("global/code_tables/#{code_table.id}")
       create_blackbaud_objects(Blackbaud::CodeTableEntry, results["table_entries"])
     end
 
     def get_static_code_tables(id)
-      results = connect("global/static_code_tables/#{id}")
+      results = @connector.get("global/static_code_tables/#{id}")
       create_blackbaud_objects(Blackbaud::CodeTableEntry, results["table_entries"])
     end
 
     def get_attendance_codes
-      results = connect("attendance/codes")
+      results = @connector.get("attendance/codes")
       create_blackbaud_objects(Blackbaud::AttendanceCode, results["attendance_codes"])
     end
 
     def get_attendance_by_class(ea7_class_id, start_date, end_date = nil)
-      results = connect("attendance/class/#{ea7_class_id}/#{format_date(start_date)}/#{format_date(end_date)}")
+      results = @connector.get("attendance/class/#{ea7_class_id}/#{format_date(start_date)}/#{format_date(end_date)}")
       create_blackbaud_objects(Blackbaud::AttendanceByClassRecord, results["attendance_by_class_records"])
     end
 
     def get_attendance_by_day(ea7_class_id, start_date, end_date = nil)
-      results = connect("attendance/day/#{ea7_class_id}/#{start_date}/#{end_date}")
+      results = @connector.get("attendance/day/#{ea7_class_id}/#{start_date}/#{end_date}")
       create_blackbaud_objects(Blackbaud::AttendanceByDayRecord, results["attendance_by_day_records"])
     end
 
     def get_class_marking_columns(class_id)
-      results = connect("grade/classes/#{class_id}/marking_columns")
+      results = @connector.get("grade/classes/#{class_id}/marking_columns")
       results["class_marking_columns"].each{|column| column["ea7_class_id"] = class_id}
       create_blackbaud_objects(Blackbaud::MarkingColumn, results["class_marking_columns"])
     end
 
     def get_grades(class_id, marking_column_id)
-      results = connect("grade/classes/#{class_id}/marking_columns/#{marking_column_id}/grades")
+      results = @connector.get("grade/classes/#{class_id}/marking_columns/#{marking_column_id}/grades")
       create_blackbaud_objects(Blackbaud::Grade, results["grades"])
     end
 
     def get_faweb_grades(class_id, marking_column_id)
-      results = connect("faweb_grade/classes/#{class_id}/marking_columns/#{marking_column_id}/grades")
+      results = @connector.get("faweb_grade/classes/#{class_id}/marking_columns/#{marking_column_id}/grades")
       create_blackbaud_objects(Blackbaud::Grade, results["faweb_grades"])
     end
 
     def get_translation_tables(id=nil)
-      results = connect("grade/translation_tables/#{id}")
+      results = @connector.get("grade/translation_tables/#{id}")
       create_blackbaud_objects(Blackbaud::TranslationTable, results["translation_tables"])
     end
 
@@ -191,32 +226,10 @@ module Blackbaud
       klass.new({values: result, client: self})
     end
 
-
-    def write_json_to_file(url, data)
-      return unless data
-      file = url.gsub( /\/|\\/, ':' ).match(/.{,250}$/).to_s + '.json'
-      # file = /[^\/]*$/.match(url).to_s + '.json'
-      file = File.expand_path(File.join(@save_request_data_to, file))
-      FileUtils.mkdir_p @save_request_data_to
-      File.open(file, 'w') { |f| f.write(JSON.pretty_unparse(JSON.parse(data)))}
-    end
-
     def format_date(date)
       return unless date
       date = DateTime.parse(date) if date.is_a?(String)
       date.strftime("%F")
-    end
-
-    def construct_url(web_services_url, endpoint, filters=nil)
-      url = "#{web_services_url}/#{endpoint}?token=#{@token}"
-      filters = Array(filters).map do |k,v|
-        v = Array(v)
-        "(#{k}%20eq%20#{v.join(',')})" if v && !v.join.empty?
-      end
-
-      url << "&filter=#{filters.join}"
-
-      url
     end
 
   end
