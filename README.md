@@ -9,12 +9,14 @@ Ruby client for the Blackbaud API.
 
 Create a Blackbaud API Client
 
+    require 'blackbaud-client'
+    
     options = {
-      :password => "pass",
-      :key => "abcde",
-      :username => "user",
-      :database => "1"
-      :url => "https://blackbaud.api.url.example/key/"
+      :database_key => "db_key",
+      :database_number => 1,
+      :vendor_id => 'vendor_id',
+      :vendor_key => 'vendor_key',
+      :url => "https://blackbaud-api-url.com"
     }
 
     @client = Blackbaud::Client.new(options)
