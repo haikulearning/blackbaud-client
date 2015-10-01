@@ -1,6 +1,6 @@
 [![Gem Version](https://badge.fury.io/rb/blackbaud-client.svg)](http://badge.fury.io/rb/blackbaud-client)
 [![Code Climate](https://codeclimate.com/github/haikulearning/blackbaud-client/badges/gpa.svg)](https://codeclimate.com/github/haikulearning/blackbaud-client)
-[![Build Status](https://secure.travis-ci.org/haikulearning/blackbaud-client.png)](http://travis-ci.org/haikulearning/blackbaud-client)
+[![Build Status](https://secure.travis-ci.org/haikulearning/blackbaud-client.svg)](http://travis-ci.org/haikulearning/blackbaud-client)
 
 # Blackbaud Client
 Ruby client for the Blackbaud API.
