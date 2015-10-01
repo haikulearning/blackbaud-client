@@ -153,6 +153,11 @@ module Blackbaud
       create_blackbaud_objects(Blackbaud::TranslationTable, results["translation_tables"])
     end
 
+    def post_grades(grades)
+      results = @connector.post('/grade/class', grades)
+      create_blackbaud_objects(Blackbaud::Grade, results["grades"])
+    end
+
     # These are for backwards compatiobilty with version <=0.1.4.  Remove them before v 1.0.
     alias_method :academic_years, :get_academic_years
     alias_method :contact_types, :get_contact_types

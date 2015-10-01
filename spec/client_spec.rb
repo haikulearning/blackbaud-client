@@ -43,5 +43,23 @@ describe Blackbaud::Client do
       end
     end
   end
-end
 
+  describe "#post_grades" do
+    context "given an ea7_class_id" do
+      it "posts updated grade data" do
+        marking_column = @client.get_class_marking_columns(7).first
+        grade = marking_column.grades.first
+
+        grade.grade = '100'
+        grade.ea7_translation_table_entry_id = nil
+
+        # TODO validate the data we are posting
+        # TODO return response data that matches what was posted
+        # TODO fix the response data path to handle grade/class and faweb_grade/class 😠
+
+        @client.post_grades(grade)
+      end
+    end
+  end
+
+end

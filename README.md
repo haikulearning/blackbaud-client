@@ -10,7 +10,7 @@ Ruby client for the Blackbaud API.
 Create a Blackbaud API Client
 
     require 'blackbaud-client'
-    
+
     options = {
       :database_key => "db_key",
       :database_number => 1,
