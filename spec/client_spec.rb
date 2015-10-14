@@ -26,7 +26,6 @@ describe Blackbaud::Client do
     stub_requests
   end
 
-
   describe "#initalize" do
     context "given auth params" do
       it "gets an auth token" do
@@ -46,7 +45,7 @@ describe Blackbaud::Client do
 
   describe "#post_grades" do
     context "given an ea7_class_id" do
-      it "posts updated grade data" do
+      it "posts an updated grade" do
         marking_column = @client.get_class_marking_columns(7).first
         grade = marking_column.grades.first
 

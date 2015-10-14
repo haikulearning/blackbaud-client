@@ -154,11 +154,11 @@ module Blackbaud
     end
 
     def post_grades(grades)
-      results = @connector.post('/grade/class', grades)
+      results = @connector.post('/grade/class', format_grades(grades))
       create_blackbaud_objects(Blackbaud::Grade, results["grades"])
     end
 
-    # These are for backwards compatiobilty with version <=0.1.4.  Remove them before v 1.0.
+    # These are for backwards compatibilty with version <=0.1.4.  Remove them before v 1.0.
     alias_method :academic_years, :get_academic_years
     alias_method :contact_types, :get_contact_types
     alias_method :relationships, :get_relationships
@@ -191,6 +191,13 @@ module Blackbaud
       klass.new({values: result, client: self})
     end
 
+    def format_grades(grades)
+      grades = [grades] unless grades.is_a?(Array)
+      JSON.generate({
+        grades: grades
+      })
+    end
+    
     def format_date(date)
       return unless date
       date = DateTime.parse(date) if date.is_a?(String)
