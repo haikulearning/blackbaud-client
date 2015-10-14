@@ -6,5 +6,8 @@ module Blackbaud
       super([:@ea7_marking_column_id, :@ea7_student_course_id, :@ea7_student_grade_id, :@ea7_translation_table_entry_id, :@message])
     end
     
+    def post
+      @client.post_grades(self)
+    end
   end
 end

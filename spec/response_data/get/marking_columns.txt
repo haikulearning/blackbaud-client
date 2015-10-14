@@ -1,7 +1,0 @@
-HTTP/1.1 200 OK
-Content-Length: 1033
-Content-Type: application/json; charset=utf-8
-Server: Microsoft-HTTPAPI/2.0
-Date: Thu, 01 Oct 2015 15:44:01 GMT
-
-{"class_marking_columns":[{"ea7_course_grading_info_grade_id":43,"description":"Quarter 1","ea7_marking_column_id":51,"ea7_translation_table_id":2,"short_description":"QT1","values_allowed":2},{"ea7_course_grading_info_grade_id":44,"description":"Quarter 2","ea7_marking_column_id":52,"ea7_translation_table_id":2,"short_description":"QT2","values_allowed":2},{"ea7_course_grading_info_grade_id":45,"description":"Quarter 3","ea7_marking_column_id":53,"ea7_translation_table_id":2,"short_description":"QT3","values_allowed":2},{"ea7_course_grading_info_grade_id":46,"description":"Quarter 4","ea7_marking_column_id":54,"ea7_translation_table_id":2,"short_description":"QT4","values_allowed":2},{"ea7_course_grading_info_grade_id":47,"description":"Semester 1","ea7_marking_column_id":55,"ea7_translation_table_id":1,"short_description":"Sem1","values_allowed":1},{"ea7_course_grading_info_grade_id":48,"description":"Semester 2","ea7_marking_column_id":56,"ea7_translation_table_id":1,"short_description":"Sem2","values_allowed":1}]}
