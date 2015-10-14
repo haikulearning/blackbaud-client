@@ -7,7 +7,12 @@ module Blackbaud
     end
 
     def get(endpoint, filters=nil)
-      url = construct_url(@web_services_url, endpoint, filters)
+      query_strings = {
+        'page' => 1,
+        'perpage' => 100
+      }
+      url = construct_url(@web_services_url, endpoint, filters, query_strings)
+      p url
       response = RestClient.get(url)
       write_json_to_file(url, json) if @save_request_data_to
       JSON.parse(response)
@@ -19,7 +24,7 @@ module Blackbaud
       JSON.parse(response)
     end
 
-    def construct_url(web_services_url, endpoint, filters=nil)
+    def construct_url(web_services_url, endpoint, filters=nil, query_strings={})
       params = "?token=#{@token}" if @token
       if filters
         filters = Array(filters).map do |k,v|
@@ -28,6 +33,9 @@ module Blackbaud
         end
         params << "&filter=#{filters.join}"
       end
+      query_strings.each do |k, v|
+        params << "&#{k}=#{v}"
+      end    
       url = "#{web_services_url}/#{endpoint}#{params}"
     end
 
