@@ -2,8 +2,9 @@ require 'spec_helper'
 
 def stub_requests
   stub_request(:any, /www.example.com/).
-    to_return(lambda do |request|
-        body = File.read("spec/response_data/#{request.method}/#{request.uri.path.split('/').last}.json")
+    to_return(lambda do |request|  
+        response_path = request.uri.path.split('/').select{|p| p[/[a-zA-Z_]+/]}.join("/") 
+        body = File.read("spec/response_data/#{request.method}/#{response_path}.json")
         response = {
           :status => 200, 
           :body => body,
@@ -61,7 +62,6 @@ describe Blackbaud::Client do
         grade = marking_column.grades.first
         grade.grade = '100'
         grade.ea7_translation_table_entry_id = nil
-        # TODO fix the response data path to handle grade/class and faweb_grade/class 😠
         grade.post
       end
     end
