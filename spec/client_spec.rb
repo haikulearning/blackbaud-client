@@ -62,7 +62,8 @@ describe Blackbaud::Client do
         grade = marking_column.grades.first
         grade.grade = '100'
         grade.ea7_translation_table_entry_id = nil
-        grade.post
+        r = grade.post
+        expect(r.size).to eq 1
       end
     end
   end

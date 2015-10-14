@@ -10,20 +10,6 @@
       "ea7_record_id": 75,
       "name_for_display": "Samantha Rae Andrews",
       "message": "(explanation of fields: a grade exists so all fields filled in)"
-    },
-    {
-      "ea7_student_course_id": 143329,
-      "ea7_record_id": 403,
-      "name_for_display": "Lisa Green",
-      "message": "(explanation of fields: no grade exists so minimum fields filled in)"
-    },
-    {
-      "ea7_student_grade_id": 1659,
-      "ea7_marking_column_id": 55,
-      "ea7_student_course_id": 143330,
-      "ea7_record_id": 204,
-      "name_for_display": "Colvin Bryant",
-      "message": "(explanation of fields: no grade exists but a comment does (not available thru api) so some fields filled in)"
     }
   ]
 }
