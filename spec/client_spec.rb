@@ -67,5 +67,18 @@ describe Blackbaud::Client do
       end
     end
   end
+  
+  describe "#format_grades" do
+    context "given a set of grades" do
+      it "formats a json object to match the blackbaud spec" do
+        marking_column = @client.get_class_marking_columns(7).first
+        grades = marking_column.grades
+        result = @client.send(:format_grades, grades)
+        expect(JSON.parse(result)['grades'].size).to eq 3
+        expect(JSON.parse(result)['grades'].first.keys.size).to eq 5
+      end
+    end
+  end
+  
 
 end
