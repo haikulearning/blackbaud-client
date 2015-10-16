@@ -18,20 +18,20 @@ module Blackbaud
       DateTime.parse(d)
     end
 
-    def to_hash(keys)
-      ivs = keys ? (instance_variables & keys) : instance_variables
+    def to_hash(keys=nil)
+      ivs = (keys ? (instance_variables & keys) : instance_variables)
       ivs -= [:@client]
       Hash[*
         ivs.map { |v|
         [v.to_s[1..-1].to_sym, instance_variable_get(v)]
       }.flatten]
     end
-    
+
     def to_json(*args)
-      JSON.generate(to_hash)  
+      JSON.generate(to_hash)
     end
-    
+
     alias_method :to_h, :to_hash
-    
+
   end
 end
