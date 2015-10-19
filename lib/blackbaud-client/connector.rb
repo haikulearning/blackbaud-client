@@ -9,7 +9,7 @@ module Blackbaud
     def get(endpoint, filters=nil)
       url = construct_url(@web_services_url, endpoint, filters)
       response = RestClient.get(url)
-      write_json_to_file(url, json) if @save_request_data_to
+      write_json_to_file(url, response) if @save_request_data_to
       JSON.parse(response)
     end
 
