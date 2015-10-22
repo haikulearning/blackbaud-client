@@ -132,6 +132,16 @@ module Blackbaud
       create_blackbaud_objects(Blackbaud::AttendanceByDayRecord, results["attendance_by_day_records"])
     end
 
+    def get_academic_year_marking_columns(year_id)
+      results = @connector.get("configuration/academic_years/#{year_id}/marking_columns")
+      create_blackbaud_objects(Blackbaud::Session, results["sessions"])
+    end
+
+    def get_session_marking_columns(session_id)
+      results = @connector.get("configuration/sessions/#{session_id}/marking_columns")
+      create_blackbaud_objects(Blackbaud::MarkingColumn, results["marking_columns"])
+    end
+
     def get_class_marking_columns(class_id)
       results = @connector.get("grade/classes/#{class_id}/marking_columns")
       results["class_marking_columns"].each{|column| column["ea7_class_id"] = class_id}
@@ -197,7 +207,7 @@ module Blackbaud
         grades: grades
       })
     end
-    
+
     def format_date(date)
       return unless date
       date = DateTime.parse(date) if date.is_a?(String)
