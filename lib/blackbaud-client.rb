@@ -2,7 +2,7 @@ require 'blackbaud-client/connector.rb'
 require 'blackbaud-client/version.rb'
 require 'blackbaud-client/api/blackbaud_object.rb'
 require 'blackbaud-client/api/academic_year.rb'
-require 'blackbaud-client/api/class.rb'
+require 'blackbaud-client/api/blackbaud_class.rb'
 require 'blackbaud-client/api/code_table.rb'
 require 'blackbaud-client/api/person.rb'
 require 'blackbaud-client/api/contact.rb'
@@ -93,12 +93,12 @@ module Blackbaud
 
     def get_classes(scope)
       results = @connector.get("schedule/#{scope.connection_string}/classes")
-      create_blackbaud_objects(Blackbaud::Class, results["classes"])
+      create_blackbaud_objects(Blackbaud::BlackbaudClass, results["classes"])
     end
 
     def get_class(id)
       results = @connector.get("schedule/classes/#{id}")
-      create_blackbaud_object(Blackbaud::Class, results["classes"].first)
+      create_blackbaud_object(Blackbaud::BlackbaudClass, results["classes"].first)
     end
 
     def get_code_tables
