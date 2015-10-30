@@ -1,0 +1,15 @@
+{
+  "grades": [
+    {
+      "ea7_student_grade_id": 1654,
+      "ea7_marking_column_id": 55,
+      "ea7_student_course_id": 143325,
+      "ea7_translation_table_entry_id": 22,
+      "grade": "A",
+      "grade_type": 1,
+      "ea7_record_id": 75,
+      "name_for_display": "Samantha Rae Andrews",
+      "message": "(explanation of fields: a grade exists so all fields filled in)"
+    }
+  ]
+}

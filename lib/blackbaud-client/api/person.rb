@@ -8,30 +8,28 @@ module Blackbaud
      :undefined => nil,
     }
 
-    def initialize(values, type_id)
-      values["type"] = type_id
-
-      if values["bio"]
-        values["bio"].each {|k, v| values[k] = v}
-        values.delete("bio")
+    def initialize(options)
+      if options.fetch(:values)["bio"]
+        options.fetch(:values)["bio"].each {|k, v| options.fetch(:values)[k] = v}
+        options.fetch(:values).delete("bio")
       end
 
-      if values["contact_info"]
-        values["contacts"] = values["contact_info"].map {|c| Blackbaud::Contact.new(c)}
-        values.delete("contact_info")
+      if options.fetch(:values)["contact_info"]
+        options.fetch(:values)["contacts"] = options.fetch(:values)["contact_info"].map {|c| Blackbaud::Contact.new({values: c})}
+        options.fetch(:values).delete("contact_info")
       else
-        values["contacts"] = []
+        options.fetch(:values)["contacts"] = []
       end
 
-      if values["relations"]
-        values["relations"].map! {|r| Blackbaud::Relation.new(r)}
+      if options.fetch(:values)["relations"]
+        options.fetch(:values)["relations"].map! {|r| Blackbaud::Relation.new({values: r})}
       else
-        values["relations"] = []
+        options.fetch(:values)["relations"] = []
       end
 
-      values["birth_date"] = format_date(values["birth_date"]) if values["birth_date"]
+      options.fetch(:values)["birth_date"] = format_date(options.fetch(:values)["birth_date"]) if options.fetch(:values)["birth_date"]
 
-      super(values)
+      super
     end
 
     def faculty?

@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.5 - 2015-09-30
+### Changed
+- Major refactor to support Post reuqests
+- Rename client methods to reflect their request type
+- Add get objects and methods for TransalationTable, TranslationTableEntry, Grades, and MarkingColumn
+
 ## 0.1.4 - 2015-07-14
 ### Changed
 - Added deceased attribute to Person.

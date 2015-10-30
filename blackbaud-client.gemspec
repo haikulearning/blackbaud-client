@@ -18,5 +18,8 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency  'ruby-hmac',    '~>0.4'
   gem.add_runtime_dependency  'rest-client',  '~>1.6'
 
-  gem.add_development_dependency  'rake'
+  gem.add_development_dependency 'rspec', '~>3.3'
+  gem.add_development_dependency 'webmock', '~>1.21'
+  gem.add_development_dependency  'rake', '~>0.9'
+  gem.add_development_dependency 'pry', '~>0.10'
 end
