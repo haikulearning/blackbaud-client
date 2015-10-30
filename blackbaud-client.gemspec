@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
   gem.authors       = "Alex Dugger"
   gem.email         = "alexd@haikulearning.com"
   gem.description   = "A client for the Blackbaud API."
-  gem.homepage      = "https://github.com/haikulearning/blackbaud-api-client"
+  gem.homepage      = "https://github.com/haikulearning/blackbaud-client"
   gem.summary       = "A client for the Blackbaud API."
   gem.files         = `git ls-files`.split($/)
   gem.require_path  = 'lib'
