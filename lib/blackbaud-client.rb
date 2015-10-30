@@ -47,7 +47,6 @@ module Blackbaud
 
     def get_academic_years(id)
       results = @connector.get("schedule/#{id}/academic_years")
-      # results["academic_years"].collect {|year| Blackbaud::AcademicYear.new(year)}
       create_blackbaud_objects(Blackbaud::AcademicYear, results["academic_years"])
     end
 

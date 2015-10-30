@@ -1,5 +1,5 @@
 module Blackbaud
-  class Class < BlackbaudObject
+  class BlackbaudClass < BlackbaudObject
     attr_accessor(:ea7_class_id, :course_id, :course_name, :section, :ea7_term_id, :ea7_term_name, :faculty, :students)
 
     def initialize(options)
