@@ -88,7 +88,7 @@ module Blackbaud
           results[response_key].each{|person| person['type'] = type_id}
         end
       end
-      create_blackbaud_objects(Blackbaud::Person, results['faculty'] + results['students'])
+      create_blackbaud_objects(Blackbaud::Person, results['faculty'].to_a + results['students'].to_a)
     end
 
     def get_classes(scope)

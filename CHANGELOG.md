@@ -1,10 +1,14 @@
 # Change Log
 
+## 0.2.1 - 2016-01-07
+### Changed
+- Fix handling of empty Teacher or Student arrays in get_people
+
 ## 0.2.0 - 2015-10-30
 ### Changed
-- Major refactor to support Post reuqests
+- Major refactor to support Post requests
 - Rename client methods to reflect their request type
-- Add get objects and methods for TransalationTable, TranslationTableEntry, Grades, and MarkingColumn
+- Add get objects and methods for TranslationTable, TranslationTableEntry, Grades, and MarkingColumn
 
 ## 0.1.4 - 2015-07-14
 ### Changed
