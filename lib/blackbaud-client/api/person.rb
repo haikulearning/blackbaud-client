@@ -1,6 +1,6 @@
 module Blackbaud
   class Person < BlackbaudObject
-    attr_accessor(:ea7_record_id, :name_for_display, :type, :birth_date, :first_name, :import_id, :last_name, :record_type, :title, :suffix, :middle_name, :user_defined_id, :nickname, :contacts, :relations, :online_user_id, :deceased)
+    attr_accessor(:ea7_record_id, :name_for_display, :type, :birth_date, :first_name, :import_id, :last_name, :record_type, :title, :suffix, :middle_name, :user_defined_id, :nickname, :contacts, :relations, :online_user_id, :deceased, :grade_level, :class_of)
 
     USER_TYPE = {
      :faculty => 1,
