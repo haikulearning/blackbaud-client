@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.2.2 - 2016-01-26
+### Changed
+- Add grade_level and class_of to Person model.
+
 ## 0.2.1 - 2016-01-07
 ### Changed
 - Fix handling of empty Teacher or Student arrays in get_people
