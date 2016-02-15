@@ -75,7 +75,7 @@ describe Blackbaud::Client do
         grades = marking_column.grades
         result = @client.send(:format_grades, grades)
         expect(JSON.parse(result)['grades'].size).to eq 3
-        expect(JSON.parse(result)['grades'].first.keys.size).to eq 5
+        expect(JSON.parse(result)['grades'].first.keys.size).to eq 6
       end
     end
   end
