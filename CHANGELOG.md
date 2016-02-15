@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.2.3 - 2016-02-15
+### Changed
+- Add grade attribute to Grade Model to_hash params.
+
 ## 0.2.2 - 2016-01-26
 ### Changed
 - Add grade_level and class_of to Person model.
