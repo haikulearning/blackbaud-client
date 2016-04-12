@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.0.0 - 2016-04-12
+### Changed
+- Add three new attributes to Relation Model.
+- It's about time we make this version 1.0
+
 ## 0.2.3 - 2016-02-15
 ### Changed
 - Add grade attribute to Grade Model to_hash params.
